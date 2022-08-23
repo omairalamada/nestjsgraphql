@@ -1,46 +1,67 @@
 import { DeleteUserInput } from './dto/input/delete-user.input';
-import { GetUsersArgs } from './dto/args/get-users.args';
 import { GetUserArgs } from './dto/args/get-user.args';
 import { UpdateUserInput } from './dto/input/update-user.input';
 import { CreateUserInput } from './dto/input/create-user.input';
-import { User } from './models/user';
-import { Injectable } from "@nestjs/common";
-import { v4 as uuidv4 } from 'uuid';
+import { UserModel } from './models/user.model';
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from '@nestjs/typeorm';
+import { FindManyOptions, FindOneOptions, Repository } from 'typeorm';
 @Injectable()
 export class UsersService {
-    private users: User[] = []
+   // private users: UserModel[] = []
+    constructor(
+        @InjectRepository(UserModel)
+        private readonly userRepository:  Repository<UserModel>
+    ) {}
 
-    public createUser(createUserData: CreateUserInput): User {
-        const user: User = {
-            userId: uuidv4(),
-            ...createUserData
-        }
-
-        this.users.push(user);
-
-        return user;
+    findOne(
+        findOneOptions: FindOneOptions<UserModel>,
+    ): Promise<UserModel> {
+        return this.userRepository.findOne(findOneOptions)
     }
 
-    public updateUser(updateUserData: UpdateUserInput): User {
-        const user = this.users.find(input => input.userId === updateUserData.userId);
-        Object.assign(user, updateUserData);
-
-        return user;
+    find(
+        findManyOptions?: FindManyOptions<UserModel>,
+    ): Promise<UserModel[]> {
+        return this.userRepository.find(findManyOptions)
     }
 
-    public getUser(getUserArgs: GetUserArgs): User {
-        return this.users.find(user => user.userId === getUserArgs.userId)
+    createUser(createUserData: CreateUserInput): Promise<UserModel> {
+        return this.userRepository.save({ ...createUserData})
     }
 
-    public getUsers(getUsersArgs: GetUsersArgs): User[] {
-        return getUsersArgs.userIds.map(userId => this.getUser({ userId }));
+    async updateUser(updateUserData: UpdateUserInput): Promise <UserModel> {
+         const user = await this.findOne({ where: { userId: updateUserData.userId } })
+
+         if (!user) {
+            throw new NotFoundException('userId not found.')
+         }
+
+         const newUser = new UserModel();
+         newUser.userId = user.userId 
+         newUser.firstName = updateUserData.firstName
+         newUser.lastName = updateUserData.lastName
+         newUser.email = updateUserData.email
+         newUser.contactNo = updateUserData.contactNo
+
+        return this.userRepository.save(newUser)
     }
 
-    // public deleteUser(deleteUserData: DeleteUserInput): User {
-    //     // const userIndex = this.users.find(user => user.userId === deleteUserData.userId)
-    //     // const userInput = this.users[userIndex];
-    //     // this.users.slice(userIndex);
+    async getUser(getUserArgs: GetUserArgs): Promise <UserModel> {
+        return this.userRepository.findOne({
+            where: {userId: getUserArgs.userId}
+        })
+    }
 
-    //     // return userInput;
-    // }
+    async deleteUser(deleteUserData: DeleteUserInput): Promise<UserModel> {
+        const user = await this.userRepository.findOne({
+            where: { userId: deleteUserData.userId },
+        })
+
+        if (!user)
+            throw new BadRequestException('userId not found! ')
+
+        return this.userRepository.remove(user)
+    }
+
 }
