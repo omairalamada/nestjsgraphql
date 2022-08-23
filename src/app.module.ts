@@ -4,6 +4,8 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigService } from '@nestjs/config'
+
 @Module({
   imports: [
     GraphQLModule.forRoot<ApolloDriverConfig>({
@@ -11,6 +13,21 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       driver: ApolloDriver
     }),
     UsersModule,
+    // TypeOrmModule.forRootAsync({
+    //   useFactory: (configService: ConfigService) => ({
+    //     type: 'postgres',
+    //     host: configService.get('DB_HOST'),
+    //     port: configService.get('DB_PORT'),
+    //     username: configService.get('DB_USERNAME'),
+    //     password: configService.get('DB_PASSWORD'),
+    //     database: configService.get('DB_DATABASE'),
+    //     entities: [UserModel],
+    //     synchronize: true,
+    //   }),
+    //   inject: [ConfigService],
+      
+    // })
+
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -22,7 +39,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       synchronize: true,
     })
   ],
+  
   controllers: [],
-  providers: [],
+  providers: [ConfigService],
 })
 export class AppModule {}

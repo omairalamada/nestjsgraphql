@@ -48,9 +48,10 @@ export class UsersService {
     }
 
     async getUser(getUserArgs: GetUserArgs): Promise <UserModel> {
-        return this.userRepository.findOne({
-            where: {userId: getUserArgs.userId}
-        })
+        const user: UserModel =
+            (await this.findOne({ where: { userId: getUserArgs.userId } })) || null
+
+        return user
     }
 
     async deleteUser(deleteUserData: DeleteUserInput): Promise<UserModel> {
