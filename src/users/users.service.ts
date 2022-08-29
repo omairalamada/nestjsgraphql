@@ -54,6 +54,12 @@ export class UsersService {
         return user
     }
 
+    async getAllUsers(): Promise<UserModel[]> {
+        const users: UserModel[] = (await this.userRepository.find()) || null
+
+        return users;
+    }
+
     async deleteUser(deleteUserData: DeleteUserInput): Promise<UserModel> {
         const user = await this.userRepository.findOne({
             where: { userId: deleteUserData.userId },
