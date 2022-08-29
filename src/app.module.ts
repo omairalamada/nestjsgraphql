@@ -5,6 +5,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config'
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { ConfigService } from '@nestjs/config'
       database: 'graphqldb',
       entities: [UserModel],
       synchronize: true,
-    })
+    }),
+    AuthModule
   ],
   
   controllers: [],
