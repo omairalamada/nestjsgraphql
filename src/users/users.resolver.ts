@@ -25,12 +25,13 @@ export class UserResolver {
     getUser(@Args() getUserArgs: GetUserArgs): Promise <UserModel> {
         return this.userUservice.getUser(getUserArgs);
     }
-
+    
     @Mutation(()  => UserModel)
     async createUser(@Args('createUserData') createUserData: CreateUserInput): Promise<UserModel> {    
         return this.userUservice.createUser(createUserData);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Mutation(() => UserModel)
     updateUser(@Args('updateUserData') updateUserData: UpdateUserInput): Promise<UserModel> {
         return this.userUservice.updateUser(updateUserData);
