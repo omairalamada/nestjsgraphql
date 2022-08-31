@@ -21,6 +21,10 @@ export class UserModel {
     email?: string;
 
     @Field()
+    @Column({ nullable: true})
+    username: string;
+
+    @Field()
     @Column({ nullable: true })
     password?: string;
 

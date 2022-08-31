@@ -4,17 +4,21 @@ import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 @InputType()
 export class CreateUserInput {
     @Field()
-    @IsString()
-    firstName: string
+    username?: string
     
     @Field()
-    @IsString()
-    lastName: string
+    password?: string
+    
+    @Field()
+    firstName?: string
+    
+    @Field()
+    lastName?: string
 
     @Field()
     @IsNotEmpty()
     @IsEmail()
-    email: string;
+    email?: string;
 
     @Field()
     @IsOptional()
